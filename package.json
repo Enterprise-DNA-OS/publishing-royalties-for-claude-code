@@ -10,7 +10,8 @@
   "scripts": {
     "migrate": "node scripts/migrate.mjs",
     "seed": "node scripts/seed.mjs",
-    "demo": "node scripts/migrate.mjs && node scripts/seed.mjs",
+    "demo": "node scripts/migrate.mjs && node scripts/seed.mjs && node scripts/royalties.mjs attention",
+    "royalties": "node scripts/royalties.mjs",
     "view": "node scripts/view.mjs",
     "docs": "node scripts/docs.mjs",
     "test": "node scripts/smoke.mjs"

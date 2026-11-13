@@ -22,9 +22,46 @@ Fill this in once. A worker with context knows. A worker without it guesses.
 
 | When the operator asks for... | Use this |
 |---|---|
-| <!-- TODO(author): one row per slash command --> | `/...` |
+| What needs me today? | `/attention` |
+| List the titles | `/titles` |
+| How is an edition selling? | `/editions` |
+| Show a contract and its rates | `/contracts` |
+| Who are our authors, and their tax details? | `/contributors` |
+| What are the rates on a contract? | `/rates` |
+| Which advances are due or paid? | `/advances` |
+| What has not earned out? | `/unearned` |
+| Run the royalty statements | `/royalty-run` |
+| Show statements or one statement | `/statements` |
+| Record a payment | `/pay` |
+| Sales for a title or period | `/sales` |
+| Rights deals and income | `/rights` |
+| What rights can we still sell? | `/rights-available` |
+| What are we publishing soon? | `/schedule` |
+| Which manuscripts are late? | `/manuscripts` |
+| Legal deposit | `/legal-deposit` |
+| Reversions | `/reversions` |
+| Are we compliant? | `/compliance` |
+| Monday review | `/weekly-review` |
+| Save the Monday review | `/draft-weekly-review` |
+| Cover letter for a statement | `/draft-statement-letter` |
+| Chase a licensee for payment | `/draft-rights-chase` |
+| Add a record | `/add` |
+| Change a field | `/update` |
+| Show one record | `/card` |
+| What changed? | `/audit` |
+| Bring data across from Klopotek | `/import` |
+| Export everything | `/export` |
+| Change a field, rule or stage | `/customise` |
+| Add a dashboard page | `/new-view` |
 
-If an ask fits nothing here, run the CLI directly (`npm run <cli> -- --help`) and then propose a new command for it.
+If an ask fits nothing here, run the CLI directly (`node scripts/royalties.mjs help`) and then propose a new command for it.
+
+## House rules for a publisher
+
+- Royalty figures, advances and tax details are private to the author they belong to. Never put one author's numbers in another's draft.
+- A statement is approved only on the operator's yes, after a dry run they have seen. Approved statements are never edited: fix the record and run the next period.
+- Record a payment, a deposit or rights income only when the operator confirms it happened, with the date it happened.
+- Contract terms come from the contract. If a rate, share or clause is not recorded, ask; never assume an industry default.
 
 ## Hard rules
 

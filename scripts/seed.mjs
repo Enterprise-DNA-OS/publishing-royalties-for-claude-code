@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-// Loads the demo data (supabase/seed.sql). Write seed.sql so a second run does nothing:
-// wrap it in a do $$ block that returns early when a known demo row already exists.
+// Loads the demo data (supabase/seed.sql), then runs, approves, sends and pays the first royalty
+// period's statements so the demo has a history. A second run does nothing.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { getDb, REPO_ROOT } from './lib/db.mjs';
+import { execute } from './royalties.mjs';
 
 export async function seed(db) {
   await db.exec('BEGIN');
@@ -15,6 +16,12 @@ export async function seed(db) {
     await db.exec('ROLLBACK');
     throw error;
   }
+  if ((await db.query('select count(*)::int as n from statements'))[0].n) return;
+  const [d] = await db.query(`select (ends_on + 60)::text as sent, (ends_on + 65)::text as paid from royalty_periods where ref = 'S1'`);
+  await execute(db, ['run-statements', 'S1']);
+  await execute(db, ['approve', 'S1']);
+  await execute(db, ['mark-sent', 'S1', `--date=${d.sent}`]);
+  await execute(db, ['mark-paid', 'S1', `--date=${d.paid}`]);
 }
 
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;

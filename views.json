@@ -2,13 +2,39 @@
   {
     "name": "week",
     "title": "This week",
-    "subtitle": "Publishing Royalties for Claude Code: what needs attention, rendered by npm run view",
+    "subtitle": "Publishing Royalties for Claude Code: what needs a publisher's attention",
     "sections": [
-      {
-        "title": "Needs attention",
-        "note": "TODO(author): point this at the industry's attention view (overdue, stuck, quiet).",
-        "sql": "select 'replace me' as item, 'TODO(author)' as why"
-      }
+      { "title": "Statements still to go out", "note": "Every closed period against every contract that should have a statement for it. The due date is the period end plus the days the contract allows.", "sql": "select rp.ref as period, c.ref as contract, w.title, p.name as payee, coalesce(s.status, 'not run') as status, rp.ends_on + c.statement_days as due_on, (rp.ends_on + c.statement_days) - current_date as days_left from royalty_periods rp cross join contracts c join works w on w.id = c.work_id join contributors p on p.id = c.contributor_id left join statements s on s.period_id = rp.id and s.contract_id = c.id where rp.ends_on < current_date and c.status = 'signed' and exists (select 1 from editions e where e.work_id = c.work_id and e.pub_date <= rp.ends_on) and coalesce(s.status, 'none') not in ('sent', 'paid') order by due_on" },
+      { "title": "Payments owed on sent statements", "sql": "select s.ref, p.name as payee, s.net_payment_cents, s.currency, s.sent_on, current_date - s.sent_on as days_since from statements s join contracts c on c.id = s.contract_id join contributors p on p.id = c.contributor_id where s.status = 'sent' and s.net_payment_cents > 0 order by s.sent_on" },
+      { "title": "Manuscripts due or late", "sql": "select w.ref, w.title, w.delivery_due_on, w.delivery_due_on - current_date as days_left from works w where w.delivered_on is null and w.delivery_due_on is not null order by w.delivery_due_on" },
+      { "title": "Rights income not yet received", "sql": "select ri.ref, d.licensee, w.title, d.right_type, ri.amount_cents, i.currency, ri.expected_on, current_date - ri.expected_on as days_overdue from rights_income ri join rights_deals d on d.id = ri.deal_id join works w on w.id = d.work_id join imprints i on i.id = w.imprint_id where ri.received_on is null order by ri.expected_on" }
+    ]
+  },
+  {
+    "name": "royalty-position",
+    "title": "Royalty position",
+    "subtitle": "Advances paid, earned on statements, and what is still unearned, contract by contract",
+    "sections": [
+      { "title": "By contract", "sql": "select contract, title, contributor, status, advances_paid_cents, advances_unpaid_cents, earned_to_date_cents, greatest(advances_paid_cents - earned_to_date_cents, 0) as unearned_cents, last_period, currency from contract_position order by contract" },
+      { "title": "Lifetime sales by edition", "sql": "select edition, title, format, pub_date, lifetime_units, units_90_days, receipts_cents, currency from edition_sales order by edition" }
+    ]
+  },
+  {
+    "name": "rights",
+    "title": "Rights",
+    "subtitle": "Every licence, what it has paid and what is owed",
+    "sections": [
+      { "title": "Licences", "sql": "select d.ref, w.title, d.right_type, d.licensee, d.territory, d.language, d.status, d.signed_on, d.expires_on, d.advance_cents, i.currency from rights_deals d join works w on w.id = d.work_id join imprints i on i.id = w.imprint_id order by d.expires_on nulls last" },
+      { "title": "Income", "sql": "select ri.ref, d.ref as deal, d.licensee, ri.note, ri.amount_cents, i.currency, ri.expected_on, ri.received_on from rights_income ri join rights_deals d on d.id = ri.deal_id join works w on w.id = d.work_id join imprints i on i.id = w.imprint_id order by coalesce(ri.received_on, ri.expected_on) desc" }
+    ]
+  },
+  {
+    "name": "schedule",
+    "title": "Publishing schedule",
+    "subtitle": "Editions publishing in the next six months, and the paperwork each needs",
+    "sections": [
+      { "title": "Forthcoming", "sql": "select e.ref as edition, w.title, e.format, e.isbn, e.pub_date, e.rrp_cents, i.currency, case when exists (select 1 from contracts c where c.work_id = w.id and c.status = 'signed') then 'signed' else 'not signed' end as contract, case when w.delivered_on is null then 'not delivered' else 'delivered' end as manuscript from editions e join works w on w.id = e.work_id join imprints i on i.id = w.imprint_id where e.pub_date > current_date and e.pub_date <= current_date + 183 order by e.pub_date" },
+      { "title": "Legal deposit on published print editions", "sql": "select edition, title, format, pub_date, library, copies_required, copies_sent, deposited_on from deposit_status order by deposited_on nulls first, pub_date desc" }
     ]
   }
 ]

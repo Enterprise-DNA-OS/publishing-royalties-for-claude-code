@@ -1,11 +1,107 @@
 [
   {
-    "name": "example",
-    "title": "TODO(author): the first document this industry must produce",
-    "for_each": "select gen_random_uuid() as id, 'Example' as name",
+    "name": "royalty-statement",
+    "title": "Royalty statement",
+    "for_each": "select s.id, s.ref || ' ' || w.title || ' ' || p.name as name from statements s join contracts c on c.id = s.contract_id join works w on w.id = c.work_id join contributors p on p.id = c.contributor_id where s.status <> 'draft'",
     "file": "name",
     "sections": [
-      { "title": "Details", "sql": "select 'replace me' as item, $1::text as record_id" }
+      {
+        "title": "Statement",
+        "layout": "record",
+        "sql": "select p.name as payee, p.agent, w.title, c.ref as contract, rp.name as period, s.status, s.due_on from statements s join contracts c on c.id = s.contract_id join works w on w.id = c.work_id join contributors p on p.id = c.contributor_id join royalty_periods rp on rp.id = s.period_id where s.id = $1"
+      },
+      {
+        "title": "Sales and royalties",
+        "sql": "select coalesce(e.isbn, '') as isbn, l.description, l.units, case l.basis when 'rrp' then 'RRP' when 'net_receipts' then 'Net receipts' else '' end as basis, l.rate_bps, l.base_cents, l.royalty_cents, s.currency from statement_lines l join statements s on s.id = l.statement_id left join editions e on e.id = l.edition_id where l.statement_id = $1 order by l.line_type, e.ref, l.channel, l.rate_bps",
+        "columns": [
+          "isbn",
+          "description",
+          "units",
+          "basis",
+          "rate_bps",
+          "base_cents",
+          "royalty_cents"
+        ]
+      },
+      {
+        "title": "Your account",
+        "layout": "record",
+        "note": "A negative balance is advance not yet earned out. The reserve held against returns is released on the next statement.",
+        "sql": "select opening_cents as opening_balance_cents, -advances_paid_cents as advances_paid_this_period_cents, earned_cents as royalties_earned_cents, subrights_cents as rights_income_share_cents, reserve_released_cents, -reserve_held_cents as reserve_held_cents, balance_cents as closing_balance_cents, gross_payable_cents, -withholding_cents as withholding_tax_cents, gst_cents, net_payment_cents, carry_forward_cents, currency from statements where id = $1",
+        "columns": [
+          "opening_balance_cents",
+          "advances_paid_this_period_cents",
+          "royalties_earned_cents",
+          "rights_income_share_cents",
+          "reserve_released_cents",
+          "reserve_held_cents",
+          "closing_balance_cents",
+          "gross_payable_cents",
+          "withholding_tax_cents",
+          "gst_cents",
+          "net_payment_cents",
+          "carry_forward_cents"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "remittance-advice",
+    "title": "Remittance advice",
+    "for_each": "select s.id, s.ref || ' ' || p.name as name from statements s join contracts c on c.id = s.contract_id join contributors p on p.id = c.contributor_id where s.status in ('approved', 'sent', 'paid') and s.net_payment_cents > 0",
+    "file": "name",
+    "sections": [
+      {
+        "title": "Payment",
+        "layout": "record",
+        "note": "Where GST is shown, this document is issued by the publisher as the tax invoice under the written agreement recorded with the payee.",
+        "sql": "select p.name as payee, nullif(p.gst_number, '') as payee_gst_number, p.tax_country as tax_residence, w.title, rp.name as period, s.gross_payable_cents as royalties_cents, s.gst_cents, s.withholding_cents as withholding_tax_cents, s.net_payment_cents, s.currency, s.paid_on from statements s join contracts c on c.id = s.contract_id join works w on w.id = c.work_id join contributors p on p.id = c.contributor_id join royalty_periods rp on rp.id = s.period_id where s.id = $1",
+        "columns": [
+          "payee",
+          "payee_gst_number",
+          "tax_residence",
+          "title",
+          "period",
+          "royalties_cents",
+          "gst_cents",
+          "withholding_tax_cents",
+          "net_payment_cents",
+          "paid_on"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "advance-information-sheet",
+    "title": "Advance information sheet",
+    "for_each": "select e.id, e.ref || ' ' || w.title as name from editions e join works w on w.id = e.work_id where e.pub_date > current_date",
+    "file": "name",
+    "sections": [
+      {
+        "title": "Title",
+        "layout": "record",
+        "sql": "select w.title, (select string_agg(p.name, ' and ' order by c.ref) from contracts c join contributors p on p.id = c.contributor_id where c.work_id = w.id) as by, i.name as imprint, e.format, e.isbn, e.rrp_cents, i.currency, e.pub_date, e.print_run from editions e join works w on w.id = e.work_id join imprints i on i.id = w.imprint_id where e.id = $1",
+        "columns": [
+          "title",
+          "by",
+          "imprint",
+          "format",
+          "isbn",
+          "rrp_cents",
+          "pub_date",
+          "print_run"
+        ]
+      },
+      {
+        "title": "Other editions",
+        "sql": "select o.format, o.isbn, o.pub_date, o.rrp_cents, i.currency from editions e join editions o on o.work_id = e.work_id and o.id <> e.id join works w on w.id = e.work_id join imprints i on i.id = w.imprint_id where e.id = $1 order by o.pub_date",
+        "columns": [
+          "format",
+          "isbn",
+          "pub_date",
+          "rrp_cents"
+        ]
+      }
     ]
   }
 ]

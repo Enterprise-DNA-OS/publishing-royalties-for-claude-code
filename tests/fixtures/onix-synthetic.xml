@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic ONIX 3.0 extract for the import test. Invented titles and ISBNs. -->
+<ONIXMessage release="3.0" xmlns="http://ns.editeur.org/onix/3.0/reference">
+  <Header><Sender><SenderName>Demo export</SenderName></Sender><SentDateTime>20261101</SentDateTime></Header>
+  <Product>
+    <RecordReference>demo-0141</RecordReference>
+    <ProductIdentifier><ProductIDType>15</ProductIDType><IDValue>978-0-00-000014-1</IDValue></ProductIdentifier>
+    <DescriptiveDetail>
+      <ProductComposition>00</ProductComposition><ProductForm>BC</ProductForm>
+      <TitleDetail><TitleType>01</TitleType><TitleElement><TitleElementLevel>01</TitleElementLevel><TitleText>Harbour Bells &amp; Other Stories</TitleText></TitleElement></TitleDetail>
+    </DescriptiveDetail>
+    <PublishingDetail><PublishingDate><PublishingDateRole>01</PublishingDateRole><Date>20260301</Date></PublishingDate></PublishingDetail>
+    <ProductSupply><SupplyDetail><Price><PriceType>02</PriceType><PriceAmount>32.99</PriceAmount><CurrencyCode>NZD</CurrencyCode></Price></SupplyDetail></ProductSupply>
+  </Product>
+  <Product>
+    <RecordReference>demo-0158</RecordReference>
+    <ProductIdentifier><ProductIDType>15</ProductIDType><IDValue>9780000000158</IDValue></ProductIdentifier>
+    <DescriptiveDetail>
+      <ProductComposition>00</ProductComposition><ProductForm>ED</ProductForm>
+      <TitleDetail><TitleType>01</TitleType><TitleElement><TitleElementLevel>01</TitleElementLevel><TitleText>Harbour Bells &amp; Other Stories</TitleText></TitleElement></TitleDetail>
+    </DescriptiveDetail>
+    <PublishingDetail><PublishingDate><PublishingDateRole>01</PublishingDateRole><Date>20260301</Date></PublishingDate></PublishingDetail>
+    <ProductSupply><SupplyDetail><Price><PriceType>02</PriceType><PriceAmount>14.99</PriceAmount><CurrencyCode>NZD</CurrencyCode></Price></SupplyDetail></ProductSupply>
+  </Product>
+  <Product>
+    <RecordReference>demo-0042</RecordReference>
+    <ProductIdentifier><ProductIDType>15</ProductIDType><IDValue>9780000000042</IDValue></ProductIdentifier>
+    <DescriptiveDetail>
+      <ProductComposition>00</ProductComposition><ProductForm>BC</ProductForm>
+      <TitleDetail><TitleType>01</TitleType><TitleElement><TitleElementLevel>01</TitleElementLevel><TitleText>Night Ferry</TitleText></TitleElement></TitleDetail>
+    </DescriptiveDetail>
+    <ProductSupply><SupplyDetail><Price><PriceType>02</PriceType><PriceAmount>22.00</PriceAmount><CurrencyCode>AUD</CurrencyCode></Price><Price><PriceType>02</PriceType><PriceAmount>36.99</PriceAmount><CurrencyCode>NZD</CurrencyCode></Price></SupplyDetail></ProductSupply>
+  </Product>
+</ONIXMessage>
